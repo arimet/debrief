@@ -7,10 +7,15 @@ on:
 
 jobs:
   unittest:
-    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python: ["3.9", "3.13"]
+        include:
+          - os: ubuntu-22.04   # oldest supported Python, the one macOS ships
+            python: "3.9"
+          - os: ubuntu-latest
+            python: "3.13"
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
