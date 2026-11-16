@@ -1,0 +1,426 @@
+{
+  "blind_spots": [
+    {
+      "authors": [
+        "dependabot[bot]"
+      ],
+      "path": "requirements.txt"
+    },
+    {
+      "authors": [
+        "Ada"
+      ],
+      "path": "invoices/discounts.py"
+    },
+    {
+      "authors": [
+        "Ada"
+      ],
+      "path": "tests/test_discounts.py"
+    },
+    {
+      "authors": [
+        "Bob"
+      ],
+      "path": "invoices/export.py"
+    },
+    {
+      "authors": [
+        "Bob"
+      ],
+      "path": "tests/test_export.py"
+    },
+    {
+      "authors": [
+        "Ada"
+      ],
+      "path": "invoices/fees.py"
+    },
+    {
+      "authors": [
+        "Ada"
+      ],
+      "path": "tests/test_fees.py"
+    }
+  ],
+  "commits": [
+    {
+      "ai_coauthored": false,
+      "author": "dependabot[bot]",
+      "body": "",
+      "date": "2026-11-13T08:00:00+01:00",
+      "email": "bot@example.com",
+      "files": [
+        {
+          "added": 1,
+          "path": "requirements.txt",
+          "removed": 1
+        }
+      ],
+      "sha": "532965f40071c9408cdfb2ae170662cca0a662e5",
+      "subject": "chore(deps): bump requests from 2.31.0 to 2.32.3 (#4)"
+    },
+    {
+      "ai_coauthored": false,
+      "author": "Ada",
+      "body": "",
+      "date": "2026-11-12T11:00:00+01:00",
+      "email": "ada@example.com",
+      "files": [
+        {
+          "added": 2,
+          "path": "invoices/discounts.py",
+          "removed": 4
+        },
+        {
+          "added": 2,
+          "path": "tests/test_discounts.py",
+          "removed": 12
+        }
+      ],
+      "sha": "d9b07aa8654453c40fedf536a103509d49c76515",
+      "subject": "Simplify discount rules (#3)"
+    },
+    {
+      "ai_coauthored": false,
+      "author": "Me",
+      "body": "VAT amounts are rounded half up to the cent, as accounting requires: 0.125 becomes 0.13, not 0.12.",
+      "date": "2026-11-11T17:00:00+01:00",
+      "email": "me@example.com",
+      "files": [
+        {
+          "added": 4,
+          "path": "invoices/vat.py",
+          "removed": 1
+        }
+      ],
+      "sha": "1374ed3f09042b6d5a144a483f7222a97f07607b",
+      "subject": "fix(vat): round VAT half up"
+    },
+    {
+      "ai_coauthored": false,
+      "author": "Bob",
+      "body": "",
+      "date": "2026-11-11T15:00:00+01:00",
+      "email": "bob@example.com",
+      "files": [
+        {
+          "added": 17,
+          "path": "invoices/export.py",
+          "removed": 0
+        },
+        {
+          "added": 17,
+          "path": "tests/test_export.py",
+          "removed": 0
+        }
+      ],
+      "sha": "a8c27c28963bae7f19f18873ab7a14dca8ff9b26",
+      "subject": "CSV export of invoices for admins (#2)"
+    },
+    {
+      "ai_coauthored": false,
+      "author": "Ada",
+      "body": "",
+      "date": "2026-11-10T10:00:00+01:00",
+      "email": "ada@example.com",
+      "files": [
+        {
+          "added": 12,
+          "path": "invoices/fees.py",
+          "removed": 1
+        },
+        {
+          "added": 12,
+          "path": "tests/test_fees.py",
+          "removed": 0
+        }
+      ],
+      "sha": "80092f44f0938cef57696f1d2f4a4ae47e925361",
+      "subject": "Late fee on overdue invoices (#1)"
+    }
+  ],
+  "digests": {
+    "features": [
+      "digests/feature-1.md",
+      "digests/feature-2.md",
+      "digests/feature-3.md",
+      "digests/feature-4.md"
+    ],
+    "sessions": [
+      "digests/session-sess-csv.txt"
+    ],
+    "trivial": [
+      "digests/feature-4.md"
+    ],
+    "unlinked": [
+      "digests/commits-unlinked-1.md"
+    ]
+  },
+  "hotzones": {
+    "dirs": [
+      {
+        "commits": 4,
+        "lines": 41,
+        "path": "invoices"
+      },
+      {
+        "commits": 3,
+        "lines": 43,
+        "path": "tests"
+      },
+      {
+        "commits": 1,
+        "lines": 2,
+        "path": "."
+      }
+    ],
+    "files": [
+      {
+        "commits": 1,
+        "lines": 17,
+        "path": "invoices/export.py"
+      },
+      {
+        "commits": 1,
+        "lines": 17,
+        "path": "tests/test_export.py"
+      },
+      {
+        "commits": 1,
+        "lines": 14,
+        "path": "tests/test_discounts.py"
+      },
+      {
+        "commits": 1,
+        "lines": 13,
+        "path": "invoices/fees.py"
+      },
+      {
+        "commits": 1,
+        "lines": 12,
+        "path": "tests/test_fees.py"
+      },
+      {
+        "commits": 1,
+        "lines": 6,
+        "path": "invoices/discounts.py"
+      },
+      {
+        "commits": 1,
+        "lines": 5,
+        "path": "invoices/vat.py"
+      },
+      {
+        "commits": 1,
+        "lines": 2,
+        "path": "requirements.txt"
+      }
+    ]
+  },
+  "period": {
+    "since": "2026-11-09",
+    "until": "2026-11-15",
+    "week": "2026-W46"
+  },
+  "priorities": [
+    {
+      "path": "requirements.txt",
+      "reasons": [
+        "blind_spot",
+        "dependency",
+        "hotzone"
+      ],
+      "score": 6
+    },
+    {
+      "path": "invoices/discounts.py",
+      "reasons": [
+        "blind_spot",
+        "hotzone"
+      ],
+      "score": 4
+    },
+    {
+      "path": "invoices/export.py",
+      "reasons": [
+        "blind_spot",
+        "hotzone"
+      ],
+      "score": 4
+    },
+    {
+      "path": "invoices/fees.py",
+      "reasons": [
+        "blind_spot",
+        "hotzone"
+      ],
+      "score": 4
+    },
+    {
+      "path": "tests/test_discounts.py",
+      "reasons": [
+        "blind_spot",
+        "hotzone"
+      ],
+      "score": 4
+    },
+    {
+      "path": "tests/test_export.py",
+      "reasons": [
+        "blind_spot",
+        "hotzone"
+      ],
+      "score": 4
+    },
+    {
+      "path": "tests/test_fees.py",
+      "reasons": [
+        "blind_spot",
+        "hotzone"
+      ],
+      "score": 4
+    },
+    {
+      "path": "invoices/vat.py",
+      "reasons": [
+        "untested",
+        "hotzone"
+      ],
+      "score": 3
+    }
+  ],
+  "prs": [
+    {
+      "additions": 25,
+      "approvals": 1,
+      "author": "ada",
+      "body": "Invoices still unpaid 30 days after their due date get a 5% late fee, capped at 50 EUR.",
+      "commits": [
+        "80092f44f0938cef57696f1d2f4a4ae47e925361"
+      ],
+      "created_at": "2026-11-10T08:00:00Z",
+      "deletions": 0,
+      "files": [
+        "invoices/fees.py",
+        "tests/test_fees.py"
+      ],
+      "merge_commit": "80092f44f0938cef57696f1d2f4a4ae47e925361",
+      "merged_at": "2026-11-10T10:00:00Z",
+      "number": 1,
+      "title": "Late fee on overdue invoices",
+      "url": "https://github.com/example/invoices/pull/1"
+    },
+    {
+      "additions": 34,
+      "approvals": 1,
+      "author": "bob",
+      "body": "Admins can download all invoices as a CSV file; other users get a 403.\n\nWe weighed streaming the file row by row against building it in memory. We build it in memory: exports stay under 10,000 rows and the code stays simple.",
+      "commits": [
+        "a8c27c28963bae7f19f18873ab7a14dca8ff9b26"
+      ],
+      "created_at": "2026-11-11T08:00:00Z",
+      "deletions": 0,
+      "files": [
+        "invoices/export.py",
+        "tests/test_export.py"
+      ],
+      "merge_commit": "a8c27c28963bae7f19f18873ab7a14dca8ff9b26",
+      "merged_at": "2026-11-11T15:00:00Z",
+      "number": 2,
+      "title": "CSV export of invoices for admins",
+      "url": "https://github.com/example/invoices/pull/2"
+    },
+    {
+      "additions": 8,
+      "approvals": 0,
+      "author": "ada",
+      "body": "Merge the loyalty and volume discounts into one rule.",
+      "commits": [
+        "d9b07aa8654453c40fedf536a103509d49c76515"
+      ],
+      "created_at": "2026-11-12T08:00:00Z",
+      "deletions": 0,
+      "files": [
+        "invoices/discounts.py",
+        "tests/test_discounts.py"
+      ],
+      "merge_commit": "d9b07aa8654453c40fedf536a103509d49c76515",
+      "merged_at": "2026-11-12T11:00:00Z",
+      "number": 3,
+      "title": "Simplify discount rules",
+      "url": "https://github.com/example/invoices/pull/3"
+    },
+    {
+      "additions": 1,
+      "approvals": 1,
+      "author": "dependabot[bot]",
+      "body": "Bumps requests from 2.31.0 to 2.32.3.",
+      "commits": [
+        "532965f40071c9408cdfb2ae170662cca0a662e5"
+      ],
+      "created_at": "2026-11-13T08:00:00Z",
+      "deletions": 0,
+      "files": [
+        "requirements.txt"
+      ],
+      "merge_commit": "532965f40071c9408cdfb2ae170662cca0a662e5",
+      "merged_at": "2026-11-13T08:00:00Z",
+      "number": 4,
+      "title": "chore(deps): bump requests from 2.31.0 to 2.32.3",
+      "url": "https://github.com/example/invoices/pull/4"
+    }
+  ],
+  "repo": {
+    "default_branch": "main",
+    "host": "github",
+    "name": "invoices",
+    "ref": "main",
+    "root": "<tmp>/fx/invoices"
+  },
+  "repo_signals": [
+    {
+      "note": "#3 merged without a human approval",
+      "ref": "#3",
+      "type": "no_human_approval"
+    },
+    {
+      "note": "#3 removed 4 assertion(s) and 2 test case(s) from test files while changing the code",
+      "ref": "#3",
+      "type": "tests_weakened"
+    }
+  ],
+  "risks": {
+    "dependencies": [
+      "requirements.txt"
+    ],
+    "migrations": [],
+    "untested": [
+      "invoices/vat.py"
+    ]
+  },
+  "sessions": [
+    {
+      "date": "2026-11-11",
+      "digest": "digests/session-sess-csv.txt",
+      "id": "sess-csv",
+      "pen": {
+        "approvals": 2,
+        "messages": 4
+      },
+      "title": "Add a CSV export of invoices, admins only",
+      "truncated": false
+    }
+  ],
+  "sources": {
+    "git": true,
+    "prs": true,
+    "sessions": 1,
+    "specs": []
+  },
+  "user": {
+    "email": "me@example.com",
+    "name": "Me"
+  },
+  "warnings": []
+}
