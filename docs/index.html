@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>debrief: your week of code, back in your head</title>
+<meta name="description" content="A Claude Code skill that turns a week of commits, pull requests and AI sessions into a quiz and a dashboard, so your team keeps a grip on code it no longer writes by hand.">
+<meta property="og:title" content="debrief">
+<meta property="og:description" content="Your week of code, back in your head. A weekly quiz and dashboard for teams that ship AI-written code.">
+<meta property="og:image" content="images/week-light.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2391aaf5' stroke='%231b1e26' stroke-width='3'/%3E%3Cpath d='M10 16.5l4 4 8-9' fill='none' stroke='%231b1e26' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+/* Same visual world as the debrief page itself: periwinkle = measured by the scripts,
+   violet + sparkle = written by Claude, ink outlines and offset shadows, pastel blobs. */
+:root {
+  color-scheme: light;
+  --page: #eef0fa; --surface: #ffffff; --subtle: #f4f5fb; --line: #d9dcea;
+  --edge: #1b1e26; --shade: #1b1e26;
+  --ink: #1b1e26; --text: #2b2f3c; --muted: #575d70; --on-fill: #1b1e26;
+  --blue: #91aaf5; --blue-grad: linear-gradient(135deg, #90a9f3, #a6e0f9); --blue-ink: #2d4cb3; --blue-50: #e8eefe;
+  --violet: #8b3ff0; --violet-ink: #7426d6; --violet-50: #f4ebff; --violet-200: #dcc4ff;
+  --coral: #ff7a5c; --coral-50: #ffe9e3; --yellow: #ffd23f; --yellow-50: #fff5d1; --cyan: #4fd6e3; --cyan-50: #ddf8fb;
+  --green: #3ccf7e; --green-50: #e2f8ea; --green-ink: #0e7a3f; --red-ink: #c4253a; --amber-ink: #9a5a00;
+  --blob-1: #fff3c4; --blob-2: #ffe4dc; --blob-3: #d9f6fa;
+  --sans: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --pop: 4px 4px 0 var(--shade);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #1b1e26; --surface: #262a35; --subtle: #2e3340; --line: #3c4253;
+    --edge: #aab2c8; --shade: #5d6580;
+    --ink: #f2f3f6; --text: #dfe2ea; --muted: #a6acbe;
+    --blue-ink: #a9bdf8; --blue-50: #283152;
+    --violet: #b47cff; --violet-ink: #c9a1ff; --violet-50: #30254a; --violet-200: #5a3f8a;
+    --coral-50: #3d2622; --yellow-50: #393119; --cyan-50: #193a3f; --green-50: #18362a;
+    --green-ink: #62d898; --red-ink: #ff8a9b; --amber-ink: #f2b456;
+    --blob-1: #2a2a2b; --blob-2: #2a2429; --blob-3: #1f2a30;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #1b1e26; --surface: #262a35; --subtle: #2e3340; --line: #3c4253;
+  --edge: #aab2c8; --shade: #5d6580;
+  --ink: #f2f3f6; --text: #dfe2ea; --muted: #a6acbe;
+  --blue-ink: #a9bdf8; --blue-50: #283152;
+  --violet: #b47cff; --violet-ink: #c9a1ff; --violet-50: #30254a; --violet-200: #5a3f8a;
+  --coral-50: #3d2622; --yellow-50: #393119; --cyan-50: #193a3f; --green-50: #18362a;
+  --green-ink: #62d898; --red-ink: #ff8a9b; --amber-ink: #f2b456;
+  --blob-1: #2a2a2b; --blob-2: #2a2429; --blob-3: #1f2a30;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; scroll-padding-top: 88px; scrollbar-color: var(--blue) var(--page); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; animation: none !important; } }
+body { margin: 0; background:
+    radial-gradient(circle at 96% 120px, var(--blob-1) 0 170px, transparent 171px),
+    radial-gradient(circle at -60px 760px, var(--blob-2) 0 230px, transparent 231px),
+    radial-gradient(circle at 104% 1500px, var(--blob-3) 0 220px, transparent 221px),
+    radial-gradient(circle at -40px 2600px, var(--blob-1) 0 190px, transparent 191px)
+    no-repeat var(--page);
+  color: var(--text); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+::selection { background: var(--violet-200); color: var(--ink); }
+a { color: var(--blue-ink); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--blue-ink); outline-offset: 3px; border-radius: 10px; }
+h1, h2, h3 { color: var(--ink); margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+p { margin: 0; }
+code { font-family: var(--mono); font-size: .9em; }
+.icon { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+
+/* Top bar */
+.topbar { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--page) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 2px solid var(--edge); }
+.topbar .wrap { display: flex; align-items: center; gap: 12px 24px; min-height: 68px; }
+.logo { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font-weight: 800; font-size: 20px; letter-spacing: -0.02em; text-decoration: none; }
+.logo .mark { display: grid; place-items: center; width: 34px; height: 34px; border: 2px solid var(--edge); border-radius: 50%; background: var(--blue-grad); color: var(--on-fill); }
+.logo .mark .icon { width: 18px; height: 18px; stroke-width: 2.6; }
+.nav { display: flex; gap: 4px; margin-left: auto; }
+.nav a { padding: 8px 14px; border-radius: 999px; color: var(--text); font-weight: 700; font-size: 15px; text-decoration: none; }
+.nav a:hover { background: var(--surface); color: var(--ink); }
+.round { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 2px solid var(--edge); border-radius: 50%; background: var(--surface); color: var(--ink); cursor: pointer; box-shadow: 3px 3px 0 var(--shade); }
+.round .icon { width: 20px; height: 20px; }
+.round:hover { background: var(--yellow-50); }
+@media (max-width: 760px) { .nav { display: none; } .topbar .btn-gh span { display: none; } .actions-top { margin-left: auto; } }
+.actions-top { display: flex; align-items: center; gap: 10px; }
+
+/* Buttons and chips */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 2px solid var(--edge); border-radius: 999px; background: var(--surface); color: var(--ink); font: 800 16px var(--sans); text-decoration: none; cursor: pointer; box-shadow: 3px 3px 0 var(--shade); transition: transform .12s ease-out, box-shadow .12s ease-out; }
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--shade); }
+.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--shade); }
+.btn.primary { background: var(--coral); color: var(--on-fill); }
+.btn .icon { width: 20px; height: 20px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px 4px 10px; border: 2px solid var(--edge); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 800; }
+.chip.violet { border-color: var(--violet); background: var(--violet-50); color: var(--violet-ink); }
+.chip.blue { border-color: var(--blue); background: var(--blue-50); color: var(--blue-ink); }
+.chip .icon { width: 16px; height: 16px; }
+
+/* Hero */
+.hero { padding: 72px 0 32px; }
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; justify-items: center; text-align: center; }
+.hero h1 { max-width: 15ch; font-size: clamp(40px, 7vw, 76px); line-height: 1.02; font-weight: 900; letter-spacing: -0.04em; }
+.hero h1 em { font-style: normal; background: linear-gradient(transparent 84%, var(--yellow) 84% 100%); padding: 0 .04em; }
+.lede { max-width: 60ch; font-size: clamp(17px, 2.2vw, 20px); color: var(--text); }
+.cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+.install { display: flex; align-items: center; gap: 4px; max-width: 100%; padding: 6px 6px 6px 20px; border: 2px solid var(--edge); border-radius: 18px; background: var(--ink); color: var(--page); box-shadow: 5px 5px 0 var(--blue); }
+.install code { min-width: 0; overflow-x: auto; scrollbar-width: none; white-space: nowrap; font-size: 16px; }
+.install code::before { content: "$ "; color: var(--blue); }
+.copy { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: transparent; color: var(--page); font: 800 14px var(--sans); cursor: pointer; }
+.copy:hover { background: color-mix(in srgb, var(--page) 16%, transparent); }
+.copy .icon { width: 18px; height: 18px; }
+
+/* Screenshot frame */
+.shot { margin: 40px auto 0; max-width: 1020px; border: 2.5px solid var(--edge); border-radius: 26px; overflow: hidden; background: var(--surface); box-shadow: 10px 10px 0 var(--shade); }
+.shot-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 2.5px solid var(--edge); background: var(--subtle); }
+.shot-bar i { width: 13px; height: 13px; border: 2px solid var(--edge); border-radius: 50%; }
+.shot-bar i:nth-child(1) { background: var(--coral); } .shot-bar i:nth-child(2) { background: var(--yellow); } .shot-bar i:nth-child(3) { background: var(--green); }
+.shot-bar span { min-width: 0; margin-left: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 13px var(--mono); color: var(--muted); }
+.shot img { display: block; width: 100%; height: auto; }
+.shot .dark-img { display: none; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .shot .light-img { display: none; } :root:not([data-theme="light"]) .shot .dark-img { display: block; } }
+:root[data-theme="dark"] .shot .light-img { display: none; } :root[data-theme="dark"] .shot .dark-img { display: block; }
+
+/* Sections */
+section.band { padding: 96px 0 0; }
+.eyebrow { display: inline-flex; margin-bottom: 14px; }
+.band h2 { font-size: clamp(30px, 4.6vw, 48px); line-height: 1.08; font-weight: 900; letter-spacing: -0.03em; max-width: 20ch; }
+.band .intro { max-width: 62ch; margin-top: 16px; font-size: 18px; }
+.head-center { text-align: center; display: grid; justify-items: center; }
+
+/* Problem quote */
+.problem { margin-top: 80px; }
+.problem .card { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px; align-items: start; padding: 32px; border: 2.5px solid var(--edge); border-radius: 28px; background: var(--surface); box-shadow: 7px 7px 0 var(--coral); }
+.problem .disc { width: 56px; height: 56px; }
+.problem p { font-size: clamp(18px, 2.4vw, 22px); line-height: 1.5; color: var(--ink); font-weight: 600; }
+.problem p + p { margin-top: 12px; font-size: 17px; font-weight: 400; color: var(--text); }
+@media (max-width: 640px) { .problem .card { grid-template-columns: minmax(0, 1fr); padding: 24px; } }
+.disc { display: inline-grid; place-items: center; flex: none; width: 44px; height: 44px; border: 2px solid var(--edge); border-radius: 50%; color: var(--on-fill); background: var(--yellow); }
+.disc .icon { width: 22px; height: 22px; }
+.disc.coral { background: var(--coral); } .disc.cyan { background: var(--cyan); } .disc.green { background: var(--green); } .disc.blue { background: var(--blue-grad); } .disc.violet { background: var(--violet); color: #fff; }
+
+/* Produce before you read: three steps with live mocks */
+.steps { display: grid; gap: 28px; margin-top: 48px; }
+.step { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 40px; align-items: center; }
+.step:nth-child(even) .step-text { order: 2; }
+.step-num { display: inline-grid; place-items: center; width: 44px; height: 44px; margin-bottom: 16px; border: 2px solid var(--edge); border-radius: 14px; background: var(--yellow); color: var(--on-fill); font-weight: 900; font-size: 20px; box-shadow: 3px 3px 0 var(--shade); }
+.step h3 { font-size: clamp(24px, 3vw, 32px); line-height: 1.15; font-weight: 900; }
+.step-text p { margin-top: 12px; font-size: 17px; max-width: 46ch; }
+@media (max-width: 860px) { .step { grid-template-columns: minmax(0, 1fr); gap: 20px; } .step:nth-child(even) .step-text { order: 0; } }
+.mock { padding: 24px; border: 2.5px solid var(--edge); border-radius: 26px; background: var(--surface); box-shadow: 7px 7px 0 var(--shade); min-width: 0; }
+.mock-title { margin-bottom: 14px; font-size: 19px; font-weight: 800; color: var(--ink); }
+.mock-sub { margin-bottom: 14px; font-size: 15px; color: var(--muted); }
+.fake-area { padding: 14px 16px; border: 2px solid var(--edge); border-radius: 18px; background: var(--subtle); color: var(--ink); font-size: 16px; line-height: 1.6; box-shadow: inset 3px 3px 0 var(--line); }
+.caret { display: inline-block; width: 2px; height: 1.1em; margin-left: 2px; vertical-align: -0.15em; background: var(--blue-ink); animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.mock-foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.mock-foot .btn { min-height: 42px; font-size: 15px; padding: 0 18px; }
+
+.question { font-size: 18px; font-weight: 800; color: var(--ink); line-height: 1.4; margin-bottom: 16px; }
+.choices { display: grid; gap: 12px; }
+.choice { display: grid; grid-template-columns: 36px minmax(0, 1fr) 22px; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 8px 14px 8px 8px; border: 2px solid var(--edge); border-radius: 18px; background: var(--surface); color: var(--ink); font: 600 15.5px/1.4 var(--sans); text-align: left; cursor: pointer; box-shadow: var(--pop); transition: transform .12s ease-out, box-shadow .12s ease-out; }
+.choice .key { display: grid; place-items: center; width: 36px; height: 36px; border: 2px solid var(--edge); border-radius: 11px; background: var(--page); font-weight: 800; }
+.choice:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--shade); }
+.choice:hover:not(:disabled) .key { background: var(--yellow); }
+.choice.picked { background: var(--blue-50); box-shadow: 4px 4px 0 var(--blue); } .choice.picked .key { background: var(--blue); }
+.choice:disabled { cursor: default; }
+.choice.team { background: var(--green-50); box-shadow: 4px 4px 0 var(--green); } .choice.team .key { background: var(--green); }
+.choice .mark { width: 22px; height: 22px; }
+.mock textarea { display: block; width: 100%; min-height: 76px; margin-top: 14px; padding: 12px 14px; border: 2px solid var(--edge); border-radius: 16px; background: var(--subtle); color: var(--ink); font: 15px/1.5 var(--sans); resize: vertical; }
+.reveal { margin-top: 16px; padding: 14px 16px; border: 2px solid var(--violet); border-radius: 18px; background: var(--violet-50); }
+.reveal-head { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; padding: 2px 12px 2px 8px; border-radius: 999px; background: var(--violet); color: #fff; font-size: 13px; font-weight: 800; }
+.reveal-head .icon { width: 15px; height: 15px; }
+.reveal p { color: var(--ink); }
+.verdict { display: inline-flex; align-items: center; gap: 8px; padding: 4px 14px 4px 6px; border: 2px solid var(--edge); border-radius: 999px; font-weight: 800; font-size: 14px; color: var(--ink); }
+.verdict .icon { width: 20px; height: 20px; stroke-width: 2.4; }
+.verdict.ok { background: var(--green-50); } .verdict.mid { background: var(--yellow-50); } .verdict.ko { background: var(--coral-50); }
+.claims { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.claims li { padding: 14px 16px; border: 2px solid var(--line); border-radius: 18px; }
+.claims blockquote { margin: 10px 0 6px; padding-left: 12px; border-left: 3px solid var(--line); color: var(--ink); font-weight: 600; }
+.claims p { font-size: 15px; color: var(--text); }
+
+/* Tabs overview */
+.tabs-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 48px; }
+@media (max-width: 900px) { .tabs-grid { grid-template-columns: minmax(0, 1fr); } }
+.tab-card { display: flex; flex-direction: column; gap: 12px; padding: 26px; border: 2.5px solid var(--edge); border-radius: 26px; background: var(--surface); box-shadow: 6px 6px 0 var(--violet); }
+.tab-card:nth-child(2) { box-shadow: 6px 6px 0 var(--coral); }
+.tab-card:nth-child(3) { box-shadow: 6px 6px 0 var(--cyan); }
+.tab-card h3 { font-size: 24px; font-weight: 900; }
+.tab-card ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.roles { display: grid; gap: 10px; margin-top: 4px; }
+.role { padding: 10px 14px; border: 2px dashed var(--line); border-radius: 16px; font-size: 15px; }
+.role b { color: var(--ink); }
+
+/* Legend + signals */
+.legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.signals { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 36px; }
+.signal { display: flex; flex-direction: column; gap: 8px; padding: 20px; border: 2px solid var(--edge); border-radius: 22px; background: var(--surface); box-shadow: 4px 4px 0 var(--blue); }
+.signal code { align-self: flex-start; padding: 2px 10px; border-radius: 8px; background: var(--blue-50); color: var(--blue-ink); font-weight: 700; }
+.signal p { font-size: 15.5px; }
+
+/* Pipeline */
+.pipeline { list-style: none; margin: 48px 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; counter-reset: s; }
+@media (max-width: 960px) { .pipeline { grid-template-columns: minmax(0, 1fr); } }
+.pipeline li { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 22px 18px; border: 2px solid var(--edge); border-radius: 22px; background: var(--surface); box-shadow: 4px 4px 0 var(--shade); counter-increment: s; }
+.pipeline li::before { content: counter(s); display: grid; place-items: center; width: 34px; height: 34px; border: 2px solid var(--edge); border-radius: 50%; background: var(--blue-grad); color: var(--on-fill); font-weight: 900; }
+.pipeline li.ai::before { background: var(--violet); color: #fff; }
+.pipeline h3 { font-size: 18px; font-weight: 900; }
+.pipeline p { font-size: 15px; }
+.pipeline .tag { align-self: flex-start; font-size: 12.5px; font-weight: 800; padding: 1px 10px; border-radius: 999px; border: 2px solid var(--blue); background: var(--blue-50); color: var(--blue-ink); }
+.pipeline li.ai .tag { border-color: var(--violet); background: var(--violet-50); color: var(--violet-ink); }
+.note { margin-top: 20px; color: var(--muted); font-size: 15px; }
+
+/* Privacy */
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 44px; }
+@media (max-width: 860px) { .trio { grid-template-columns: minmax(0, 1fr); } }
+.trio > div { display: flex; flex-direction: column; gap: 10px; padding: 24px; border: 2px solid var(--edge); border-radius: 24px; background: var(--surface); }
+.trio h3 { font-size: 20px; font-weight: 900; }
+.trio p { font-size: 15.5px; }
+
+/* Install */
+.install-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 44px; }
+@media (max-width: 860px) { .install-grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { display: flex; flex-direction: column; gap: 14px; padding: 26px; border: 2.5px solid var(--edge); border-radius: 26px; background: var(--surface); box-shadow: 6px 6px 0 var(--shade); min-width: 0; }
+.panel h3 { font-size: 22px; font-weight: 900; }
+.code { position: relative; margin: 0; padding: 16px 18px; border: 2px solid var(--edge); border-radius: 16px; background: var(--ink); color: var(--page); font: 14.5px/1.7 var(--mono); overflow-x: auto; white-space: pre; }
+.req { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.req li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 15.5px; }
+.req .icon { width: 22px; height: 22px; margin-top: 1px; }
+.req .yes { color: var(--green-ink); } .req .opt { color: var(--muted); }
+.usage { display: flex; flex-wrap: wrap; gap: 10px; }
+.usage code { padding: 6px 12px; border: 2px solid var(--edge); border-radius: 12px; background: var(--subtle); color: var(--ink); font-weight: 700; }
+
+/* Footer */
+footer { margin-top: 110px; padding: 40px 0 calc(48px + env(safe-area-inset-bottom, 0px)); border-top: 2px solid var(--edge); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; align-items: center; }
+footer p { font-size: 15px; color: var(--muted); max-width: 62ch; }
+
+/* Small screens */
+@media (max-width: 640px) {
+  .hero { padding-top: 44px; }
+  section.band { padding-top: 72px; }
+  .shot { border-radius: 18px; box-shadow: 6px 6px 0 var(--shade); }
+  .install { padding-left: 16px; }
+  .install code { font-size: 13px; }
+  .copy span { display: none; }
+  .mock { padding: 18px; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.3l2.4 2.4 4.6-5"/></symbol>
+  <symbol id="i-tick" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.8v5"/><path d="M12 16.2v.01"/></symbol>
+  <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-dasharray="2.2 3"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M11 3.5l1.8 4.9 4.9 1.8-4.9 1.8L11 16.9l-1.8-4.9-4.9-1.8 4.9-1.8z"/><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8.5V6a2 2 0 0 1 2-2h2.5M15.5 4H18a2 2 0 0 1 2 2v2.5M20 15.5V18a2 2 0 0 1-2 2h-2.5M8.5 20H6a2 2 0 0 1-2-2v-2.5M8 12h8"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7.5a2 2 0 0 0 2 2h2.5"/></symbol>
+  <symbol id="i-github" viewBox="0 0 24 24"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/></symbol>
+  <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 6.1A9.6 9.6 0 0 1 12 6c5 0 8.5 4.5 9.5 6-.5.8-1.6 2.2-3.1 3.5M6.3 7.8C4.5 9 3.1 10.8 2.5 12c1 1.5 4.5 6 9.5 6 1.6 0 3-.4 4.3-1.1M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5l7 2.8v5.2c0 4.3-3 7.6-7 9-4-1.4-7-4.7-7-9V6.3z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9.5" r="2.5"/><path d="M16.5 14.2c2.2.2 3.6 1.8 4 4.3"/></symbol>
+  <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4.5 13v-1a7.5 7.5 0 0 1 15 0v1"/><rect x="3.5" y="13" width="4" height="6" rx="1.5"/><rect x="16.5" y="13" width="4" height="6" rx="1.5"/></symbol>
+</svg>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="logo" href="#top"><span class="mark"><svg class="icon"><use href="#i-tick"/></svg></span>debrief</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#produce">How it feels</a>
+      <a href="#page">The page</a>
+      <a href="#under-the-hood">Under the hood</a>
+      <a href="#install">Install</a>
+    </nav>
+    <div class="actions-top">
+      <a class="btn btn-gh" href="https://github.com/arimet/debrief"><svg class="icon"><use href="#i-github"/></svg><span>GitHub</span></a>
+      <button type="button" class="round" id="theme" aria-label="Switch theme"><svg class="icon"><use href="#i-moon"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <span class="chip violet"><svg class="icon"><use href="#i-sparkle"/></svg>A skill for Claude Code</span>
+      <h1>Your week of code, <em>back in your head</em>.</h1>
+      <p class="lede">debrief turns a week of commits, pull requests and AI sessions into a quiz and a dashboard, so your team keeps a grip on code it no longer writes by hand.</p>
+      <div class="install" role="group" aria-label="Install command">
+        <code id="cmd">npx skills add arimet/debrief</code>
+        <button type="button" class="copy" data-copy="cmd" aria-label="Copy the install command"><svg class="icon"><use href="#i-copy"/></svg><span>Copy</span></button>
+      </div>
+      <div class="cta">
+        <a class="btn primary" href="#produce">See how it works</a>
+        <a class="btn" href="https://github.com/arimet/debrief"><svg class="icon"><use href="#i-github"/></svg>Read the code</a>
+      </div>
+    </div>
+    <div class="wrap">
+      <figure class="shot" style="margin-bottom:0">
+        <div class="shot-bar" aria-hidden="true"><i></i><i></i><i></i><span>127.0.0.1 · .debrief/2026-W36</span></div>
+        <img class="light-img" src="images/week-light.png" width="2560" height="1920" alt="The This week tab of debrief: the week's features as cards, each with its summary, its source and the cases handled and not handled.">
+        <img class="dark-img" src="images/week-dark.png" width="2560" height="1920" alt="" >
+      </figure>
+    </div>
+  </section>
+
+  <div class="wrap problem">
+    <div class="card">
+      <span class="disc coral"><svg class="icon"><use href="#i-eye-off"/></svg></span>
+      <div>
+        <p>When AI writes the code, you spend the week reading and approving. The pull requests pass, the features ship, and on Friday nobody can quite say which rule they follow, or why.</p>
+        <p>Reviewing what someone else produced is not the same as knowing it. debrief puts you back in the position of the one who produces: once a week, you say what shipped before the tool shows you.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="band" id="produce">
+    <div class="wrap">
+      <span class="chip eyebrow">Produce before you read</span>
+      <h2>Three moves, ten minutes, once a week.</h2>
+      <p class="intro">The order matters. You write first, from memory, then the page tells you what you missed. Try the second one below.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-text">
+            <span class="step-num">1</span>
+            <h3>Retell the week from memory</h3>
+            <p>The quiz opens on a blank box. What shipped this week, and for whom? A few sentences, in your own words, without looking.</p>
+          </div>
+          <div class="mock" aria-label="Example retelling">
+            <p class="mock-title">Tell your week</p>
+            <p class="mock-sub">Before the quiz, without reopening the week tab.</p>
+            <div class="fake-area">This week we added offline sync to the scorer's table, coaches got a subscription to edit the playbook, and plays can now be shared by link<span class="caret"></span></div>
+            <div class="mock-foot"><span class="btn">Skip</span><span class="btn primary">Save and start the quiz</span></div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-text">
+            <span class="step-num">2</span>
+            <h3>Make the call the team made</h3>
+            <p>Decision questions give you the context of a real choice from the week. You pick, you say what you rule out, and only then do you see what the team chose and why.</p>
+            <p>A different choice is not a wrong answer. It is the conversation you should have had before the merge.</p>
+          </div>
+          <div class="mock" id="decide">
+            <p class="question">The scorer's phone loses the network in the middle of a game. What should the app do?</p>
+            <div class="choices">
+              <button type="button" class="choice" data-i="0"><span class="key">A</span><span>Keep a local copy and sync when the network is back</span><span></span></button>
+              <button type="button" class="choice" data-i="1"><span class="key">B</span><span>Write every action to the database first, and say so when it cannot</span><span></span></button>
+              <button type="button" class="choice" data-i="2"><span class="key">C</span><span>Queue the actions and let the admin merge conflicts later</span><span></span></button>
+            </div>
+            <textarea id="why" aria-label="What you rule out, and why" placeholder="What you rule out, and why"></textarea>
+            <div class="mock-foot"><button type="button" class="btn primary" id="decide-go" disabled>Confirm my decision</button></div>
+            <div class="reveal" id="decide-reveal" hidden>
+              <p class="reveal-head"><svg class="icon"><use href="#i-sparkle"/></svg>Claude · from the pull request</p>
+              <p id="decide-verdict" style="font-weight:800;margin-bottom:6px"></p>
+              <p>The team chose B: one database, and the screen says "saved" only once the database has it. Nothing lives only on a phone anymore. The price is written down too: no scoring in a gym without network, listed as a case not handled.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-text">
+            <span class="step-num">3</span>
+            <h3>See what you got wrong</h3>
+            <p>Ask Claude to compare your retelling. Each claim is checked against what the pull requests, specs and commits say, and the features you never mentioned are listed.</p>
+            <p>The vocabulary check catches the quiet ones: a word that is not the one the team uses usually means the logic will land in the wrong place.</p>
+          </div>
+          <div class="mock" aria-label="Example comparison">
+            <p class="mock-title">Against the pull requests</p>
+            <ul class="claims">
+              <li><span class="verdict ko"><svg class="icon"><use href="#i-x"/></svg>Drifts from the PRs</span>
+                <blockquote>we added offline sync to the scorer's table</blockquote>
+                <p>The opposite: offline mode was removed. Every action is written to the database first.</p></li>
+              <li><span class="verdict mid"><svg class="icon"><use href="#i-alert"/></svg>Vocabulary</span>
+                <blockquote>subscription</blockquote>
+                <p>The sources say "access level". There is no billing, coaches get a code.</p></li>
+              <li><span class="verdict ok"><svg class="icon"><use href="#i-check"/></svg>Matches</span>
+                <blockquote>plays can now be shared by link</blockquote>
+                <p>By link, image, PDF or GIF.</p></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="page">
+    <div class="wrap">
+      <span class="chip eyebrow">One local page</span>
+      <h2>Three tabs, one for each question.</h2>
+      <p class="intro">Everyone sees the same week. The role only changes the questions and the part of the dashboard written for you.</p>
+      <div class="tabs-grid">
+        <article class="tab-card">
+          <span class="disc"><svg class="icon"><use href="#i-scan"/></svg></span>
+          <h3>This week</h3>
+          <p>What shipped, in plain words: each feature with its source, the cases it handles and the ones it does not.</p>
+          <div class="roles">
+            <p class="role"><b>Business</b>: what changes for users, and the questions to ask the client.</p>
+            <p class="role"><b>Technical</b>: most-changed files, untested files, blind spots, commit heatmap.</p>
+          </div>
+        </article>
+        <article class="tab-card">
+          <span class="disc coral"><svg class="icon"><use href="#i-check"/></svg></span>
+          <h3>Quiz</h3>
+          <p>The retelling, then 5 to 10 questions picked from the work you did not write yourself first.</p>
+          <ul>
+            <li>What happens when a user does this?</li>
+            <li>Where does this rule live?</li>
+            <li>Why was it built this way?</li>
+            <li>What would you have decided?</li>
+          </ul>
+        </article>
+        <article class="tab-card">
+          <span class="disc cyan"><svg class="icon"><use href="#i-sparkle"/></svg></span>
+          <h3>Review</h3>
+          <p>Your retelling, compared claim by claim.</p>
+          <p>How the team worked: descriptions, approvals, tests, merge speed.</p>
+          <p>How you worked with Claude: framing, evidence, control, and who held the pen.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="under-the-hood">
+    <div class="wrap">
+      <span class="chip eyebrow">Under the hood</span>
+      <h2>Facts first, then Claude.</h2>
+      <p class="intro">Scripts measure, Claude writes, and the page tells you which is which. Every statement carries its source, and a rule read only in the code says so.</p>
+      <div class="legend">
+        <span class="chip blue"><svg class="icon"><use href="#i-scan"/></svg>Measured by the scripts</span>
+        <span class="chip violet"><svg class="icon"><use href="#i-sparkle"/></svg>Written by Claude</span>
+      </div>
+
+      <ol class="pipeline">
+        <li><h3>Extract</h3><span class="tag">no AI</span><p>Commits, merged pull requests, risky files, blind spots, team signals, your redacted sessions.</p></li>
+        <li class="ai"><h3>Summarize</h3><span class="tag">subagents</span><p>Up to 8 in parallel, one card per feature, each statement tagged with its source.</p></li>
+        <li><h3>Assemble</h3><span class="tag">no AI</span><p>Cards merged. Dependency, CI and release PRs listed without a summary.</p></li>
+        <li class="ai"><h3>Quiz &amp; review</h3><span class="tag">Claude</span><p>Questions start with your blind spots and the risky files.</p></li>
+        <li><h3>Check &amp; render</h3><span class="tag">no AI</span><p>Every file, commit and id verified, then one self-contained HTML page.</p></li>
+      </ol>
+      <p class="note">About 5 minutes for a week of 100 commits and 30 pull requests. A rerun reuses the cards of unchanged pull requests.</p>
+
+      <div class="signals">
+        <div class="signal"><code>tests_weakened</code><p>Assertions or test cases removed while the code changed: the tests rewritten until they pass.</p></div>
+        <div class="signal"><code>ai_without_tests</code><p>A commit co-authored by an AI assistant that touches no test.</p></div>
+        <div class="signal"><code>fast_large_merge</code><p>400 lines or more merged within 30 minutes of opening.</p></div>
+        <div class="signal"><code>no_human_approval</code><p>Merged without a single human approval.</p></div>
+        <div class="signal"><code>blind spots</code><p>Files changed this week whose history you never touched. They feed the quiz first.</p></div>
+        <div class="signal"><code>who holds the pen</code><p>How many of your messages to Claude only said "ok" or "go".</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="privacy">
+    <div class="wrap">
+      <span class="chip eyebrow">Private by default</span>
+      <h2>A mirror, not a dashboard for managers.</h2>
+      <div class="trio">
+        <div><span class="disc green"><svg class="icon"><use href="#i-shield"/></svg></span><h3>Stays on your machine</h3><p>Served on <code>127.0.0.1</code>, answers in a local file, <code>.debrief/</code> kept out of git. Sharing is a download you choose to make.</p></div>
+        <div><span class="disc"><svg class="icon"><use href="#i-users"/></svg></span><h3>Nobody is ranked</h3><p>The quiz never asks who wrote what. The repository review speaks about the team, never about one person.</p></div>
+        <div><span class="disc violet"><svg class="icon"><use href="#i-eye-off"/></svg></span><h3>Sessions are redacted</h3><p>Keys, tokens, <code>.env</code> values, emails and your home path are masked before Claude reads a session.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="install">
+    <div class="wrap">
+      <span class="chip eyebrow">Install</span>
+      <h2>One command, then <code style="font-size:.8em">/debrief</code> every week.</h2>
+      <div class="install-grid">
+        <div class="panel">
+          <h3>Get the skill</h3>
+          <pre class="code">npx skills add arimet/debrief</pre>
+          <p>Or from a clone, so a <code>git pull</code> keeps it up to date:</p>
+          <pre class="code">git clone git@github.com:arimet/debrief.git
+ln -s "$(pwd)/debrief/skills/debrief" \
+  ~/.claude/skills/debrief</pre>
+        </div>
+        <div class="panel">
+          <h3>Run it</h3>
+          <p>In a repository, in Claude Code:</p>
+          <div class="usage"><code>/debrief</code><code>/debrief --branch develop</code><code>/debrief --lang en</code><code>compare my retelling</code></div>
+          <p>Or in your own words: "quiz me on this week", "what did we ship this week".</p>
+          <ul class="req" aria-label="Requirements">
+            <li><svg class="icon yes"><use href="#i-check"/></svg><span><b>Claude Code</b>, <b>git</b> and <b>Python 3.9+</b>, standard library only. The skill checks Python first and explains how to install it.</span></li>
+            <li><svg class="icon opt"><use href="#i-dot"/></svg><span><b>gh</b> for pull requests. Without it, the week is read from git alone. GitLab through <b>glab</b> is partial.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="logo" href="#top"><span class="mark"><svg class="icon"><use href="#i-tick"/></svg></span>debrief</a>
+    <p>MIT licensed. Session parsing and redaction come from <a href="https://github.com/arimet/conversation-review">conversation-review</a>. The idea of making you produce before you read comes from Thomas Pierrain's <a href="https://medium.com/@tpierrain/back-in-the-equation-218cecb4c2cd">Back in the equation</a>.</p>
+  </div>
+</footer>
+
+<script>
+// Theme: follows the system until the visitor picks one; the pick is remembered.
+const root = document.documentElement, themeBtn = document.getElementById("theme");
+const isDark = () => root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+function paintTheme() {
+  themeBtn.querySelector("use").setAttribute("href", isDark() ? "#i-sun" : "#i-moon");
+  themeBtn.setAttribute("aria-label", isDark() ? "Switch to light theme" : "Switch to dark theme");
+}
+try { const t = localStorage.getItem("debrief-site:theme"); if (t === "dark" || t === "light") root.dataset.theme = t; } catch (e) {}
+themeBtn.addEventListener("click", () => {
+  root.dataset.theme = isDark() ? "light" : "dark";
+  try { localStorage.setItem("debrief-site:theme", root.dataset.theme); } catch (e) {}
+  paintTheme();
+});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", paintTheme);
+paintTheme();
+
+// Copy buttons
+document.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
+  const text = document.getElementById(b.dataset.copy).textContent, label = b.querySelector("span");
+  try { await navigator.clipboard.writeText(text); label.textContent = "Copied"; }
+  catch (e) { const r = document.createRange(); r.selectNodeContents(document.getElementById(b.dataset.copy)); getSelection().removeAllRanges(); getSelection().addRange(r); label.textContent = "Selected"; }
+  setTimeout(() => { label.textContent = "Copy"; }, 1600);
+}));
+
+// The decision question: pick, say what you rule out, then see the team's choice.
+const TEAM = 1, box = document.getElementById("decide"), go = document.getElementById("decide-go");
+let picked = null;
+box.querySelectorAll(".choice").forEach((c) => c.addEventListener("click", () => {
+  picked = +c.dataset.i;
+  box.querySelectorAll(".choice").forEach((x) => { x.classList.toggle("picked", x === c); x.setAttribute("aria-pressed", String(x === c)); });
+  go.disabled = false;
+}));
+go.addEventListener("click", () => {
+  box.querySelectorAll(".choice").forEach((x) => {
+    const i = +x.dataset.i;
+    x.disabled = true; x.classList.remove("picked");
+    if (i === TEAM) { x.classList.add("team"); x.lastElementChild.outerHTML = '<svg class="icon mark"><use href="#i-check"/></svg>'; }
+  });
+  document.getElementById("decide-verdict").textContent = picked === TEAM ? "Same choice as the team." : "Not the team's choice. Here is theirs:";
+  document.getElementById("decide-reveal").hidden = false;
+  go.parentElement.hidden = true;
+});
+</script>
+</body>
+</html>
