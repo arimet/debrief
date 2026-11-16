@@ -183,17 +183,44 @@ About 5 minutes for a week of 100 commits and 30 pull requests. A rerun reuses t
 
 ## Development
 
-```bash
-python3 -m unittest discover -s tests -v
-```
-
 ```
 skills/debrief/SKILL.md          the skill: steps, and the rules for cards, quiz and review
 skills/debrief/scripts/          extract, assemble, validate, render, serve (Python stdlib)
 skills/debrief/scripts/template.html   the page
-tests/                           unit tests
-docs/specs/                      design spec
+tests/                           unit tests, and the golden facts of the fixture week
+evals/                           the fixture week, its checks, and the end-to-end runner
+docs/                            landing page, screenshots, design spec
 ```
+
+### Tests
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+They run on every push. `tests/test_golden.py` extracts a fixed **fixture week** ([`evals/fixture.py`](evals/fixture.py): a small invoicing app, four pull requests, a commit outside any PR, a Claude session) and compares it with [`tests/golden/facts.json`](tests/golden/facts.json). Every commit is dated and authored explicitly, so the result is the same on every machine. When a change to the scripts is intended, refresh it with `UPDATE_GOLDEN=1`.
+
+### Evals
+
+What Claude writes changes from run to run, so the eval checks properties, not text. The fixture week hides traps with a known right answer:
+
+| Trap | Expected |
+|---|---|
+| a rule written in the PR, another one only in the code | the second is tagged `inferred` |
+| a rule stated in a commit message | provenance `commit` |
+| a PR that weighs two options | a decision question |
+| a PR that removes a test case and its assertions | flagged in the review |
+| a dependency bump | listed without a summary |
+| a retelling with a wrong figure, a wrong format and a wrong word | `drift`, `drift` or `new`, `word`, and the missing feature |
+
+Plus no trivia question, technical questions starting from blind spots, and at most two points to clarify per feature.
+
+```bash
+python3 evals/run.py              # builds the week, runs Claude Code on it (a few minutes), checks
+python3 evals/check.py <week>     # checks an existing week folder
+```
+
+Run it after changing `SKILL.md` or when a new model comes out. It needs the `claude` CLI, logged in.
 
 ## License
 
